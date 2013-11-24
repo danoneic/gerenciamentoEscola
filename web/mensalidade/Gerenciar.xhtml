@@ -57,40 +57,15 @@
 
                             <p:commandButton value="TURMA INTEIRA" 
                                              style="font-size: small; font-weight: bolder" 
-                                             oncomplete="dlgoTurma.show();"
                                              actionListener="#{gerenciarMensalidade.verTurmaInteira}"
-                                             update=":formDlgTurma:turma">
+                                             update="dtMensalidade">
                                 <f:attribute name="matricula" value="#{matricula}"/></p:commandButton>
 
                         </center>
                     </p:column>
                 </p:dataTable>
             </h:form>
-
-            <h:form id="formDlgViz">
-                <p:dialog id ="visualiza" header="Visualização" widgetVar="dlgoVisualiza">
-
-                    <h:panelGrid columns="2">
-                        <h:outputText value="ID Matrícula:" />
-                        <p:inputText value="#{gerenciarMensalidade.selecionado.id}" disabled="true"/>
-                        <h:outputText value="Nome:" />
-                        <p:inputText value="#{gerenciarMensalidade.selecionado.aluno.nome}" disabled="true"/>
-                        <h:outputText value="Curso:" />
-                        <p:inputText value="#{gerenciarMensalidade.selecionado.turma.nivel.curso.nome}" disabled="true"/>
-                        <h:outputText value="Nível:" />
-                        <p:inputText value="#{gerenciarMensalidade.selecionado.turma.nivel.nome}" disabled="true"/>
-                    </h:panelGrid>
-
-                    <p:dataTable value="#{gerenciarMensalidade.LMat}" var="mat">
-                        <f:facet name="header"><h:outputText value="MÊS" style="font-weight: bold; color: teal"/></f:facet>
-                        <p:columns value="#{gerenciarMensalidade.dados}" var="mes" headerText="#{mes.mes}">
-                            <p:commandButton  style=" #{gerenciarMensalidade.defineCor(mes)}" disabled="true" value="#{mes.situMensalidade}"/>
-                        </p:columns>
-                    </p:dataTable>
-                </p:dialog> 
-            </h:form>
-
-
+            
             <h:form id="formDlgAlt">
                 <p:growl id="gMensalidade" showDetail="false" />
 

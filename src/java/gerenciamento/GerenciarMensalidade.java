@@ -9,7 +9,6 @@ import com.entity.Turma;
 import com.persist.EntityPersist;
 import com.util.CriteriaGroup;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +23,6 @@ import org.primefaces.context.RequestContext;
 @ViewScoped
 @ManagedBean
 public class GerenciarMensalidade {
-    private final static List<String> VALID_COLUMN_KEYS = Arrays.asList("mensalidades");
     private GerenciarMatricula gerMat,turmaMat;
     private List<Mensalidade> dados, mensalidades;
     private Mensalidade mensalidade;
@@ -206,7 +204,7 @@ public class GerenciarMensalidade {
         }
     }
 
-    public void consultar(ActionEvent ae) {
+    public void consultar() {
         System.out.println(param);
         System.out.println(busca);
         if (busca.trim().equals("")) {
@@ -261,15 +259,12 @@ public class GerenciarMensalidade {
             Logger.getLogger(GerenciarMensalidade.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
     public void verTurmaInteira(ActionEvent ae) {
         selecionado = (Matricula) ae.getComponent().getAttributes().get("matricula");
-
-        //Atribuicao extra para linkagem do mês
-        retomarSessao();
-        
-        lMat = ep.search(Matricula.class, 
-                new CriteriaGroup("eq","turma", selecionado.getTurma(), matriculas));
+        param = "turma";
+        busca = selecionado.getTurma().getTurma();
+        consultar();
         
         
     }
