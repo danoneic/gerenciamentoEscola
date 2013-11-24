@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
 public class GerenciarAlunoTest {
 
     GerenciarAluno gerAl = new GerenciarAluno();
-    String nome, telefone, endereco, uf, cidade;
+    String nome, telefone, endereco, uf, cidade, nomemae, nomepai;
     char sexo;
     int idade;
     Date dataNasc;
@@ -37,10 +37,12 @@ public class GerenciarAlunoTest {
         dataNasc = new Date(1999, 4, 20);
         telefone = "(44)3222-2222";
         idade = 20;
-        endereco = "rua nossa";
+        endereco = "nossa";
         uf = "PR";
         cidade = "maringa";
         sexo = 'M';
+        nomemae = "";
+        nomepai = "";
     }
 
     @After
@@ -57,12 +59,13 @@ public class GerenciarAlunoTest {
 
     @Test
     public void testCadastrarAlunoSucesso() {
-
-        String resultado = "invalido";
         gerAl.setAluno(new Aluno(nome, dataNasc, telefone, idade, endereco, uf, cidade, sexo));
+        gerAl.getAluno().setNomeMae(nomemae);
+        gerAl.getAluno().setNomePai(nomepai);
         gerAl.cadastrarAluno();
         gerAl.setAlunos(gerAl.getEp().search(Aluno.class,
                 new CriteriaGroup("eq", "nome", "rogerio", null)));
+        String resultado = "invalido";
         for (Aluno a : gerAl.getAlunos()) {
             if (a.getNome().equals("rogerio")) {
                 resultado = "valido";

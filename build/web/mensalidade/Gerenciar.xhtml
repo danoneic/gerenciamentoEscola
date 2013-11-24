@@ -65,7 +65,28 @@
                     </p:column>
                 </p:dataTable>
             </h:form>
-            
+            <h:form id="formDlgViz">
+                <p:dialog id ="visualiza" header="Visualização" widgetVar="dlgoVisualiza">
+
+                    <h:panelGrid columns="2">
+                        <h:outputText value="ID Matrícula:" />
+                        <p:inputText value="#{gerenciarMensalidade.selecionado.id}" disabled="true"/>
+                        <h:outputText value="Nome:" />
+                        <p:inputText value="#{gerenciarMensalidade.selecionado.aluno.nome}" disabled="true"/>
+                        <h:outputText value="Curso:" />
+                        <p:inputText value="#{gerenciarMensalidade.selecionado.turma.nivel.curso.nome}" disabled="true"/>
+                        <h:outputText value="Nível:" />
+                        <p:inputText value="#{gerenciarMensalidade.selecionado.turma.nivel.nome}" disabled="true"/>
+                    </h:panelGrid>
+
+                    <p:dataTable value="#{gerenciarMensalidade.LMat}" var="mat">
+                        <f:facet name="header"><h:outputText value="MÊS" style="font-weight: bold; color: teal"/></f:facet>
+                        <p:columns value="#{gerenciarMensalidade.dados}" var="mes" headerText="#{mes.mes}">
+                            <p:commandButton  style=" #{gerenciarMensalidade.defineCor(mes)}" disabled="true" value="#{mes.situMensalidade}"/>
+                        </p:columns>
+                    </p:dataTable>
+                </p:dialog> 
+            </h:form>
             <h:form id="formDlgAlt">
                 <p:growl id="gMensalidade" showDetail="false" />
 
@@ -95,25 +116,6 @@
                     <p:separator/>
                     <br/>
 
-                </p:dialog>
-            </h:form>
-
-
-            <h:form id="formDlgTurma">
-                <p:dialog id="turma" header="Mensalidades da Turma" widgetVar="dlgoTurma">
-                    <h:panelGrid columns="2">
-                        <h:outputText value="Turma" />
-                        <p:inputText value="#{gerenciarMensalidade.selecionado.turma.turma}" disabled="true"/>
-                        <h:outputText value="Professor:" />
-                        <p:inputText value="#{gerenciarMensalidade.selecionado.turma.professor.nome}" disabled="true"/>
-                    </h:panelGrid>
-                      
-                    <p:dataTable id="dtTurma" paginator="true" rows="5" var="matricula" value="#{gerenciarMensalidade.LMat}">
-                        <f:facet name="header"><h:outputText style="font-weight: bold; color: teal" value="Turma"></h:outputText></f:facet>  
-
-                        <p:column><h:outputText value="#{matricula.aluno.nome}"/></p:column>
-                    </p:dataTable>
-                    <br/>
                 </p:dialog>
             </h:form>
 

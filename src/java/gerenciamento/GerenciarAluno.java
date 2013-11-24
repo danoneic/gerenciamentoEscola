@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.ActionEvent;
-import javax.sound.midi.Soundbank;
 import messages.Gmessages;
 import org.primefaces.context.RequestContext;
 
@@ -104,12 +103,23 @@ public class GerenciarAluno {
             msg.falhaCadastro(null);
             msg.dadosObrig(null);
             valido = false;
-
         }
-        if ((aluno.getNome().length() < 4) || (aluno.getNomeMae() != null && aluno.getNomeMae().length() < 4)
-                || (aluno.getNomePai() != null && aluno.getNomePai().length() < 4)
-                || (aluno.getEndereco().length() < 4)) {
-            System.out.println(aluno.getNomePai());
+
+        boolean jaexiste = false;
+        alunos = ep.search(Aluno.class, new CriteriaGroup("eq", "rg", aluno.getRg(), null));
+        if (!(alunos.isEmpty())) {
+            jaexiste = true;
+        }
+        if (aluno.getRg() != null && jaexiste == true) {
+            if (valido == true) {
+                msg.falhaCadastro(null);
+            }
+            msg.rgExiste(null);
+            valido = false;
+        }
+        if ((aluno.getNome().length() < 4) || (aluno.getEndereco().length() < 4)
+                || (aluno.getNomeMae().length() != 0 && aluno.getNomeMae().length() < 4)
+                || (aluno.getNomePai().length() != 0 && aluno.getNomePai().length() < 4)) {
             if (valido == true) {
                 msg.falhaCadastro(null);
             }
@@ -134,8 +144,6 @@ public class GerenciarAluno {
         }
         if (valido) {
             try {
-                System.out.println(d);
-                System.out.println(aluno.getDataNasc());
                 ep.save(aluno);
                 RequestContext.getCurrentInstance().execute("confirmation.show()");
             } catch (Exception ex) {
@@ -162,49 +170,14 @@ public class GerenciarAluno {
     }
 
     public void alterarAluno(ActionEvent ae) {
-        boolean valido = true;
-        Date d = new Date();
-        if (selecionado.getNome().equals("") || selecionado.getDataNasc() == null
-                || selecionado.getSexo() == 'x' || selecionado.getIdade() == 0
-                || selecionado.getTelefone().equals("") || selecionado.getCidade().equals("")
-                || selecionado.getEndereco().equals("")) {
-            msg.falhaCadastro(null);
-            msg.dadosObrig(null);
-            valido = false;
+        System.out.println(selecionado.getNome());
 
-        }
-        if ((selecionado.getNome().length() < 4) || (selecionado.getNomeMae() != null && selecionado.getNomeMae().length() < 4)
-                || (selecionado.getNomePai() != null && selecionado.getNomePai().length() < 4)
-                || (selecionado.getEndereco().length() < 4)) {
-            if (valido == true) {
-                msg.falhaCadastro(null);
-            }
-            msg.tamanhoInsuf(null);
-            valido = false;
+        try {
+            ep.update(selecionado);
+            msg.alterar(ae);
 
-        }
-        if (selecionado.getIdade() < 0) {
-            if (valido == true) {
-                msg.falhaCadastro(null);
-            }
-            msg.idadeInvalida(null);
-            valido = false;
-
-        }//System.out.println(d);System.out.println(aluno.getDataNasc());
-        if (selecionado.getDataNasc() == null) { //||aluno.getDataNasc().after(d)
-            if (valido == true) {
-                msg.falhaCadastro(null);
-            }
-            msg.dataInvalida(null);
-            valido = false;
-        }
-        if (valido) {
-            try {
-                ep.update(selecionado);
-                msg.alterar(ae);
-            } catch (Exception ex) {
-                Logger.getLogger(GerenciarAluno.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        } catch (Exception ex) {
+            Logger.getLogger(GerenciarAluno.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -223,16 +196,11 @@ public class GerenciarAluno {
 
     public void ativar(ActionEvent ae) {
         selecionado.setEstadoAtivo();
-        System.out.println("ausyease");
-        System.out.println(selecionado.getEstado());
         try {
             ep.update(selecionado);
             msg.ativado(ae);
-            setIsAtivo(false);
         } catch (Exception ex) {
             Logger.getLogger(GerenciarAluno.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-
     }
 }

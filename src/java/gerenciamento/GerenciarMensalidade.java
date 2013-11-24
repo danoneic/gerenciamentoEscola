@@ -205,8 +205,6 @@ public class GerenciarMensalidade {
     }
 
     public void consultar() {
-        System.out.println(param);
-        System.out.println(busca);
         if (busca.trim().equals("")) {
             gerMat.setMatriculas(null);
             //mensalidades = ep.search(Mensalidade.class, new CriteriaGroup("ge", "id", 1, null));     
