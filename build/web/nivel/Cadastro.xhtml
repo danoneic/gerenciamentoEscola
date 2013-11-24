@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+    <ui:composition template="/template.xhtml">
+        <ui:define name="panelHeader">Cadastrar Nivel</ui:define>
+        <ui:define name="centro">
+            <h:form id="f1">
+                <script>
+                    function swBack() {
+                        self.location = "/LangSchool/faces/index.xhtml";
+                    }
+                </script>
+                
+                <p:growl id="growl"/>
+                <h:panelGrid columns="2" cellpadding="4" id="grid">
+                    <h:outputText value="Nome: *" />
+                    <p:inputText value="#{gerenciarNivel.nivel.nome}" style="width: 350px "/>
+                    <h:outputText value="Descricao:" />
+                    <p:inputTextarea cols="50" value="#{gerenciarNivel.nivel.descricao}"/>
+                    <h:outputLabel value="Carga Horária: "/>
+                    <p:spinner min="0" value="#{gerenciarNivel.nivel.cargaHoraria}" />
+                    <h:outputText value="Curso: " />
+                    <p:selectOneMenu value ="#{gerenciarNivel.nivel.curso.id}" >
+                        <f:selectItems value="#{gerenciarCurso.cursos}" var="c"
+                                       itemValue="#{c.id}" itemLabel="#{c.nome}" />
+                    </p:selectOneMenu>
+                </h:panelGrid>
+
+                <h:panelGrid columns="2" cellpadding="4">
+                    
+                    <p:commandButton value="CANCELAR" style="color: red;font-size: small;font-weight: bold"
+                                     onclick="swBack();"/>
+                    <p:commandButton value="SALVAR" style="color: green;font-size: small;font-weight: bold"
+                                     update=":f1:growl, :f1:grid"
+                                     actionListener="#{gerenciarNivel.cadastrarNivel}"/>
+                </h:panelGrid>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>

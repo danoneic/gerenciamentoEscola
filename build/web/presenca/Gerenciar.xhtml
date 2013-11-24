@@ -1,0 +1,148 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <ui:composition template="/template.xhtml">
+        <ui:define name="panelHeader">Gerenciar Presenças</ui:define>
+        <ui:define name="centro">
+            <h:form id="gerPres">
+                <br/>
+                <h:panelGrid columns="2">
+                    <h:outputText value="Pesquisar por:" />
+                    <p:selectOneMenu value="#{gerenciarPresenca.param}">
+                        <f:selectItem itemLabel="Nome" itemValue="nome" />
+                        <f:selectItem itemLabel="Curso" itemValue="curso" />
+                        <f:selectItem itemLabel="Turma" itemValue="turma" />
+                    </p:selectOneMenu>
+                </h:panelGrid>
+
+                <p:inputText style="width:60%" value="#{gerenciarPresenca.busca}" />
+                <p:commandButton value="Buscar" style="color: blue; font-size: small; margin-left: 20px" icon="ui-icon-search"
+                                 actionListener="#{gerenciarPresenca.consultarMatricula}" update="tabPres"/>
+
+                <p:dataTable id="tabPres" var="matricula" value="#{gerenciarPresenca.busMat.matriculas}" 
+                             emptyMessage="Nenhum dado encontrado.">
+
+                    <f:facet name="header">Resultados da Busca</f:facet>
+                    <p:column headerText="ID Matricula">
+                        <h:outputText value="#{matricula.id}"/>
+                    </p:column>
+                    <p:column headerText="Nome">
+                        <h:outputText value="#{matricula.aluno.nome}"/>
+                    </p:column>
+                    <p:column headerText="Curso">
+                        <h:outputText value="#{matricula.turma.nivel.curso.nome}"/>
+                    </p:column>
+                    <p:column headerText="Nível">
+                        <h:outputText value="#{matricula.turma.nivel.nome}"/>
+                    </p:column>
+                    <p:column headerText="Turma">
+                        <h:outputText value="#{matricula.turma.turma}"/>
+                    </p:column>
+                    <p:column headerText="Ações" style="color: orangered">
+                        <p:commandButton value="VISUALIZAR" style="font-size: small; font-weight: bolder" 
+                                         actionListener="#{gerenciarPresenca.selectMatricula}" 
+                                         oncomplete="visualizar.show();" update=":visuPres:visu">
+                            <f:attribute name="matricula" value="#{matricula}"/>
+                        </p:commandButton>
+                        <p:commandButton value="TURMA INTEIRA" style="font-size: small; font-weight: bolder" 
+                                         action="#{gerenciarPresenca.consultarTurma(matricula)}" 
+                                         oncomplete="turma.show();" update=":altTurm:turm"/>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+
+            <h:form id="visuPres">
+                <p:dialog id="visu" header="Visualização" widgetVar="visualizar">
+                    <h:panelGrid columns="2">
+                        <h:outputText value="ID Matrícula:" />
+                        <p:inputText value="#{gerenciarPresenca.selecionado.id}" disabled="true"/>
+                        <h:outputText value="Nome:" />
+                        <p:inputText value="#{gerenciarPresenca.selecionado.aluno.nome}" disabled="true"/>
+                        <h:outputText value="Curso:" />
+                        <p:inputText value="#{gerenciarPresenca.selecionado.turma.nivel.curso.nome}" disabled="true"/>
+                        <h:outputText value="Nível:" />
+                        <p:inputText value="#{gerenciarPresenca.selecionado.turma.nivel.nome}" disabled="true"/>
+                        <br/>
+                    </h:panelGrid>
+
+                    <p:dataTable value="#{gerenciarPresenca.ind}" var="pog">
+                        <p:columns var="tabAlu"  value="#{gerenciarPresenca.lpres}"  headerText="#{tabAlu.dia}">
+                            <center>
+                                <p:selectBooleanButton value="#{tabAlu.estado}" offLabel="X" onLabel="O" 
+                                                       disabled="true" style="font-size: small"/>
+                            </center>
+                        </p:columns>
+                    </p:dataTable>
+                    <br/>
+                    <p:separator/>
+                    <p:commandButton value="Sair" ajax="true" style="color: red; font-weight: bolder; font-size: small" 
+                                     onclick="visualizar.hide();"/>
+                </p:dialog> 
+            </h:form>
+            
+            <h:form id="altTurm">
+                <p:growl id="mess"/>
+                <p:dialog id="turm" header="Lista de Presença da Turma" widgetVar="turma">
+                    <h:panelGrid columns="2">
+                        <h:outputText value="Turma" />
+                        <p:inputText value="#{gerenciarPresenca.seleciona.turma.id}" />
+                        <h:outputText value="Professor:" />
+                        <p:inputText value="#{gerenciarPresenca.seleciona.turma.professor.nome}" />
+                        <h:outputText/>
+                        <br/>
+                    </h:panelGrid>   
+                    <br/> 
+                    <h:panelGrid>
+                        <h:outputText value="Data:"/>
+                        <p:calendar id="popupCal" disabledWeekends="true" value="#{gerenciarPresenca.data}" 
+                                    mindate="1/1/13" maxdate="12/31/13"/>
+                        <p:selectOneRadio value="#{gerenciarPresenca.estado}">
+                            <f:selectItem itemLabel="PRESENTE" itemValue="True"/>
+                            <f:selectItem itemLabel="AUSENTE" itemValue="False"/>
+                        </p:selectOneRadio>
+                        <p:separator/>
+                        <p:commandButton value="Adicionar" style="font-weight: bolder; font-size: small" 
+                                         action="#{gerenciarPresenca.adicionarPresencaTurm(seleciona)}" oncomplete="dlg.show();" 
+                                         update="" process="@this"/>
+                    </h:panelGrid>
+
+                    <p:separator/>
+                    
+                    <p:columnGroup type="header">
+                            <p:row>
+                                <p:column headerText="Id"/>
+                                <p:column headerText="Nome"/>
+                                <p:column headerText="Data/Presença"/>
+                            </p:row>
+                    </p:columnGroup>
+                    <p:dataTable id="tabTurm" var="matriculas" value="#{gerenciarPresenca.alunosTurm}">
+                        <p:column>
+                            <center>
+                                <h:outputText value="#{matriculas.id}"/>
+                            </center>
+                        </p:column> 
+                        <p:column>
+                            <center>
+                                <h:outputText value="#{matriculas.aluno.nome}"/>
+                            </center>
+                        </p:column> 
+                        
+                       
+                    </p:dataTable>
+                    <br/>
+                    <p:commandButton value="CANCELAR" style="color: red; font-weight: bolder; font-size: small" 
+                                     onclick="turma.hide();"/>
+                    <p:commandButton value="SALVAR" style="color: green; font-weight: bolder; font-size: small; margin-left: 20px" 
+                                     action="#{gerenciarPresenca.todaTurm2}"
+                                     update=":altTurm:tabTurm" oncomplete="turma.hide()"/>
+                </p:dialog>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>
+

@@ -1,0 +1,158 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <ui:composition template="/template.xhtml">
+        <ui:define name="panelHeader">Gerenciar Turma</ui:define>
+        <ui:define name="centro">
+            <h:form id="formGerTurma">
+                <br/>
+                <h:panelGrid columns="2" cellpadding="5">
+                    <h:outputText value="Pesquisar por:"/>
+                    <p:selectOneMenu value="#{gerenciarTurma.param}">
+                        <f:selectItem itemLabel="Nome" itemValue="turma"/>
+                        <f:selectItem itemLabel="Estado" itemValue="estado"/>
+                    </p:selectOneMenu>
+                </h:panelGrid>
+
+                <p:inputText style="width: 60%;" value="#{gerenciarTurma.busca}"/>
+                <p:commandButton icon="ui-icon-search" value="Buscar" style="color: blue; margin-left: 10px; margin-bottom: 20px" actionListener="#{gerenciarTurma.consultarTurma}" update="dtTurmas"/>
+
+                <p:dataTable var="turma" id="dtTurmas" value="#{gerenciarTurma.turmas}"
+                             emptyMessage="Turma não encontrada!">
+                    <f:facet name="header">
+                        Lista de Turmas
+                    </f:facet>
+
+                    <p:column headerText="ID">
+                        <h:outputText value="#{turma.id}"
+                                             style="font-size: small; font-weight: bold"/>
+                    </p:column>
+                    <p:column headerText="Nome">
+                        <h:outputText value="#{turma.turma}"
+                                             style="font-size: small; font-weight: bold"/>
+                    </p:column>
+                    <p:column headerText="Nivel">
+                        <h:outputText value="#{turma.nivel.nome}"
+                                             style="font-size: small; font-weight: bold"/>
+                    </p:column>
+                    <p:column headerText="Vagas Restantes">
+                        <h:outputText value="#{turma.vagasRest}"
+                                             style="font-size: small; font-weight: bold"/>
+                    </p:column>
+
+                    <p:column headerText="Açoes">
+                        <center>
+                            <p:commandButton icon="ui-icon-zoomin" actionListener="#{gerenciarTurma.selectTurma}"
+                                             oncomplete="dlgViz.show();" update=":formDlgTurma:dlogViz"
+                                             style="font-size: small; font-weight: bold">
+                                <f:attribute name="turma" value="#{turma}"/>
+                            </p:commandButton>
+                            <p:commandButton icon="ui-icon-wrench" actionListener="#{gerenciarTurma.selectTurma}"
+                                             oncomplete="dlgAlt.show();" update=":formDlgTurma:dlogAlt"
+                                             style="font-size: small; font-weight: bold">
+                                <f:attribute name="turma" value="#{turma}"/>
+                            </p:commandButton>
+                            <p:commandButton icon="ui-icon-close" actionListener="#{gerenciarTurma.selectTurma}"
+                                             oncomplete="dlgRem.show();" update=":formDlgRemTurma:dlogRem"
+                                             style="font-size: small; font-weight: bold">
+                                <f:attribute name="turma" value="#{turma}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>                    
+                </p:dataTable>
+            </h:form>
+
+            <h:form id="formDlgTurma">
+                <p:dialog id="dlogViz" header="Visualização" widgetVar="dlgViz">
+                    <p:scrollPanel style="width: 800px; height: 400px">
+                        <h:panelGrid columns="4" cellpadding="5" id="panelViz">
+                            <h:outputText value="Turma *:" />
+                            <p:inputText value="#{gerenciarTurma.selecionado.turma}" disabled="true"/>
+
+                            <h:outputText value="Descrição *:" />
+                            <p:inputText value="#{gerenciarTurma.selecionado.descricao}" disabled="true"/>
+
+                            <h:outputText value="Total de Vagas *:" />
+                            <p:inputText value="#{gerenciarTurma.selecionado.vagas}" disabled="true"/>
+                            
+                            <h:outputText value="Vagas Restantes *:" />
+                            <p:inputText value="#{gerenciarTurma.selecionado.vagasRest}" disabled="true"/>
+                            
+                            <h:outputText value="Professor:"/>
+                            <p:inputText value="#{gerenciarTurma.selecionado.professor.nome}" disabled="true"/>
+                        </h:panelGrid>
+                    </p:scrollPanel>
+                </p:dialog> 
+
+                <p:growl showDetail="false" severity="info" id="gTurma" />
+                <p:remoteCommand name="atualizarTurmas" update=":formGerTurma:dtTurmas"/>
+
+                <p:dialog id="dlogAlt" header="Alterar Dados" widgetVar="dlgAlt" onHide="atualizarTurmas()">
+                    <h:panelGrid columns="5" cellpadding="4">
+                        <h:outputText/>
+                        <h:outputText/>
+                        <p:commandButton value="Salvar" style="color: green" actionListener="#{gerenciarTurma.alterarTurma}" 
+                                         update="gTurma,panelAlt" oncomplete="if (args &amp;&amp; !args.validationFailed) dlgAlt.hide()"/>
+                        <h:outputText value=" " />
+                        <p:commandButton value="Cancelar" style="color: red" onclick="dlgAlt.hide()"/>
+                    </h:panelGrid>
+                        <h:panelGrid columns="4" cellpadding="5" id="panelAlt">
+                            <h:outputText value="Turma *:" />
+                            <p:inputText value="#{gerenciarTurma.selecionado.turma}" required="true"/>
+
+                            <h:outputText value="Descrição *:" />
+                            <p:inputTextarea cols="20" value="#{gerenciarTurma.selecionado.descricao}" required="true"/>
+
+                            <h:outputText value="Total de Vagas:" />
+                            <p:inputText value="#{gerenciarTurma.selecionado.vagas}" required="true"/>
+
+                            <h:outputText value="Vagas Restantes *:" />
+                            <p:inputText value="#{gerenciarTurma.selecionado.vagasRest}" required="true"/>
+
+                            <h:outputText value="Professor:"/>
+                            <p:inputText value="#{gerenciarTurma.selecionado.professor.nome}" disabled="true"/>
+                            
+                            <h:outputText value="Trocar professor:" />
+                            <p:selectOneMenu id="professor" value="#{gerenciarTurma.selecionado.professor}" converter="professor">
+                                <f:selectItem itemLabel="Selecione" itemValue=""/>
+                                <f:selectItems value="#{gerenciarTurma.gerenProf.professores}" var="professor" itemLabel="#{professor.nome}" itemValue="#{professor}"/>
+                            </p:selectOneMenu>
+                            
+                            <h:outputText value="Estado"/>
+                            <p:commandButton value="Ativar" actionListener="#{gerenciarTurma.ativar}" update="gTurma" disabled="#{gerenciarTurma.isAtivo}"/>
+                        </h:panelGrid>
+                </p:dialog> 
+            </h:form>
+
+            <h:form id="formDlgRemTurma">
+                <p:growl showDetail="false" severity="info" id="gTurma" />
+                <p:remoteCommand name="atualizarTurmas" update=":formGerTurma:dtTurmas"/>
+
+                <p:dialog id="dlogRem" header="Remover" widgetVar="dlgRem" onHide="atualizarTurmas()">
+                    <br/>
+                    <h:outputText value="Tem certeza que deseja remover este turma?" style="font-size: large; color: red" />
+                    <br/>
+                    <br/>
+                    <br/>
+                    <h:panelGrid columns="2" style="width: 100%">
+                        <p:column colspan="20">
+                            <div style="text-align: center">
+                                <p:commandButton value="SIM" style="color: green; font-weight: bolder" actionListener="#{gerenciarTurma.removerTurma}" update="gTurma" oncomplete="dlgRem.hide()"/>
+                            </div>
+                        </p:column>
+                        <p:column colspan="20">
+                            <div style="text-align: center">
+                                <p:commandButton value="NÃO" style="color: red; font-weight: bolder" onclick="dlgRem.hide()"/>
+                            </div>
+                        </p:column>
+                    </h:panelGrid>
+                </p:dialog>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>

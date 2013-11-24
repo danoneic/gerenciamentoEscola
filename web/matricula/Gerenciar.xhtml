@@ -1,0 +1,120 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <ui:composition template="/template.xhtml">
+        <ui:define name="panelHeader">Gerenciar Matricula</ui:define>
+        <ui:define name="centro">
+            <h:form id="formGerMatricula">
+                <br/>
+                <h:panelGrid columns="2" cellpadding="5">
+                    <h:outputText value="Pesquisar por:"/>
+                    <p:selectOneMenu value="#{gerenciarMatricula.param}">
+                        <f:selectItem itemLabel="Nome" itemValue="nome"/>
+                        <f:selectItem itemLabel="Turma" itemValue="turma"/>
+                        <f:selectItem itemLabel="Nivel" itemValue="nivel"/>
+                        <f:selectItem itemLabel="Curso" itemValue="curso"/>
+                        <f:selectItem itemLabel="Estado" itemValue="estado"/>
+                    </p:selectOneMenu>
+                </h:panelGrid>
+
+                <p:inputText style="width: 60%;" value="#{gerenciarMatricula.busca}"/>
+                <p:commandButton icon="ui-icon-search" value="Buscar" style="color: blue; margin-left: 10px; margin-bottom: 20px" 
+                                 actionListener="#{gerenciarMatricula.consultarMatricula}" update="dtMatriculas"/>
+
+                <p:dataTable var="matricula" id="dtMatriculas" value="#{gerenciarMatricula.matriculas}"
+                             emptyMessage="Matricula nao encontrado!" paginator="true" rows="5" 
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PageLinks} {LastPageLink}"
+                             paginatorPosition="top">
+                    <f:facet name="header">
+                        Lista de Matriculas
+                    </f:facet>
+
+                    <p:column headerText="ID">
+                        <h:outputText value="#{matricula.id}"
+                                      style="font-size: small; font-weight: bold"/>
+                    </p:column>
+                    <p:column headerText="Aluno">
+                        <h:outputText value="#{matricula.aluno.nome}"
+                                      style="font-size: small; font-weight: bold"/>
+                    </p:column>
+                    <p:column headerText="Data">
+                        <h:outputText value="#{matricula.dataMatricula}"
+                                      style="font-size: small; font-weight: bold"/>
+                    </p:column>
+                    <p:column headerText="Curso">
+                        <h:outputText value="#{matricula.turma.nivel.curso.nome}"
+                                      style="font-size: small; font-weight: bold"/>
+                    </p:column>
+                    <p:column headerText="Nivel">
+                        <h:outputText value="#{matricula.turma.nivel.nome}"
+                                      style="font-size: small; font-weight: bold"/>
+                    </p:column>
+                    <p:column headerText="Turma">
+                        <h:outputText value="#{matricula.turma.turma}"
+                                      style="font-size: small; font-weight: bold"/>
+                    </p:column>
+
+                    <p:column headerText="Açoes">
+                        <center>
+                            <p:commandButton value="visualizar" actionListener="#{gerenciarMatricula.selectMatricula}"
+                                             oncomplete="dlgViz.show();" update=":formDlgMatricula:dlogViz"
+                                             style="font-size: small; font-weight: bold">
+                                <f:attribute name="matricula" value="#{matricula}"/>
+                            </p:commandButton>
+                            <p:commandButton value="excluir" actionListener="#{gerenciarMatricula.selectMatricula}"
+                                             oncomplete="dlgRem.show();" update=":formDlgRemMatricula:dlogRem"
+                                             style="font-size: small; font-weight: bold">
+                                <f:attribute name="matricula" value="#{matricula}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>                    
+                </p:dataTable>
+            </h:form>
+
+            <h:form id="formDlgMatricula">
+                <p:dialog id="dlogViz" header="Visualização" widgetVar="dlgViz">
+                    <p:scrollPanel>
+                        <h:panelGrid columns="2" cellpadding="5" id="panelViz">
+                            <h:outputText value="Aluno *:" />
+                            <p:outputLabel value="#{gerenciarMatricula.selecionado.aluno.nome}"/>
+                            <h:outputText value="Data *:" />
+                            <p:outputLabel value="#{gerenciarMatricula.selecionado.dataMatricula}"/>
+                            <h:outputText value="Turma *:" />
+                            <p:outputLabel value="#{gerenciarMatricula.selecionado.turma.turma}"/>
+                        </h:panelGrid>
+                    </p:scrollPanel>
+                </p:dialog> 
+            </h:form>
+            <h:form id="formDlgRemMatricula">
+                <p:growl showDetail="false" severity="info" id="gMatricula" />
+                <p:remoteCommand name="atualizarMatriculas" update=":formGerMatricula:dtMatriculas"/>
+
+                <p:dialog id="dlogRem" header="Remover" widgetVar="dlgRem" onHide="atualizarMatriculas()">
+                    <br/>
+                    <h:outputText value="Tem certeza que deseja remover este matricula??" style="font-size: large; color: red" />
+                    <br/>
+                    <br/>
+                    <br/>
+                    <h:panelGrid columns="2" style="width: 100%">
+                        <p:column colspan="20">
+                            <div style="text-align: center">
+                                <p:commandButton value="SIM" style="color: green; font-weight: bolder" actionListener="#{gerenciarMatricula.removerMatricula}" update="gMatricula" oncomplete="dlgRem.hide()"/>
+                            </div>
+                        </p:column>
+                        <p:column colspan="20">
+                            <div style="text-align: center">
+                                <p:commandButton value="NÃO" style="color: red; font-weight: bolder" onclick="dlgRem.hide()"/>
+                            </div>
+                        </p:column>
+                    </h:panelGrid>
+                </p:dialog>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>
+

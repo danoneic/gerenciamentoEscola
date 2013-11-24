@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+    <ui:composition template="/template.xhtml">
+        <ui:define name="panelHeader">Gerenciar Curso</ui:define>
+        <ui:define name="centro">
+            <h:form id="formGerCurso" >
+                <script>
+                    function swBack() {
+                        self.location = "/LangSchool/faces/curso/Gerenciar.xhtml#";
+                    }
+                </script>
+                <p:growl id="growl"/>
+                <h:outputText value="Pesquisar por:" />
+                <h:panelGrid columns="3" cellpadding="5" id="p1">
+                    <p:selectOneMenu value ="#{gerenciarCurso.searchParam}">
+                        <f:selectItem itemLabel="Nome" itemValue="nome" />
+                        <f:selectItem itemLabel="Descricao" itemValue="descricao"/>
+                    </p:selectOneMenu>
+
+                    <p:inputText value="#{gerenciarCurso.searchValue}"/>
+                    <p:commandButton update="cursos"
+                                     
+                                     actionListener="#{gerenciarCurso.consultarCurso}"
+                                     style="font-size: small;color: blue;font-weight: bold;"
+                                     value="BUSCAR"
+                                     icon="ui-icon-search" />
+                </h:panelGrid>
+
+                <p:dataTable id="cursos" paginator="true" rows="5" paginatorPosition="top"
+                             paginatorAlwaysVisible="true" emptyMessage="Nenhum Resultado Encontrado!"
+                             var="curso" value="#{gerenciarCurso.cursos}" style="font-size: medium;" >
+
+                    <p:column headerText="Nome" style="width: 260px">
+                        <h:outputText value="#{curso.nome}" ></h:outputText>
+                    </p:column>
+                    <p:column headerText="Descrição" style="width: 440px">
+                        <h:outputText value="#{curso.descricao}"   ></h:outputText>
+                    </p:column>
+                    <p:column>
+                        <p:commandButton value="ALTERAR" style="font-size: small; font-weight: bold"
+                                         actionListener="#{gerenciarCurso.escolherCurso}"
+                                         oncomplete="dlA.show();"
+                                         process="@this"
+                                         update=":formGerCurso:dlA">
+                            <f:attribute name="curso" value="#{curso}"/>
+                        </p:commandButton>
+                    </p:column>
+                    <p:column>
+                        <p:commandButton update =":formGerCurso:dlE" value="REMOVER"
+                                         style="font-size: small; font-weight: bold"
+                                         actionListener="#{gerenciarCurso.escolherCurso}"
+                                         process="@this"
+                                         oncomplete="dlE.show();">
+                            <f:attribute name="curso" value="#{curso}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+
+                <p:dialog id="dlA" header="Alterar Curso" widgetVar="dlA" closable="false">
+
+                    <h:panelGrid id="pa" columns="2">
+                        <h:outputText value="Nome: *" />
+                        <p:inputText id="nome" value="#{gerenciarCurso.cursoEscolhido.nome}" style="width: 350px "
+                                     />
+                        <h:outputText value="Descricao: " />
+                        <p:inputTextarea cols="50" value="#{gerenciarCurso.cursoEscolhido.descricao}" maxlength="200"/>
+
+                    </h:panelGrid>
+                    <h:panelGrid columns="2">
+                        <p:commandButton value="CANCELAR" style="color: red; margin-left: 20px;font-size: small;font-weight: bold;"
+                                         onclick="dlA.hide();" process="@this" update="dlA,pa,cursos"
+                                         actionListener="#{gerenciarCurso.atualizarForm}"/>
+
+                        <p:commandButton value="SALVAR" style="color: green; margin-left: 20px; font-size: small;font-weight: bold;"
+                                         actionListener="#{gerenciarCurso.atualizarCurso}"
+                                         update="pa, growl,cursos"
+                                         
+                                         />
+                    </h:panelGrid>
+                </p:dialog>
+
+                <p:dialog id ="dlE" header="Remover Curso" widgetVar="dlE" closable="false">
+                    <h:outputLabel value="Tem certeza que deseja remover esse Curso?"/>
+                    <p:separator/>
+                    <h:panelGrid columns="2">
+
+                        <p:commandButton value="Sim" style="color: green"
+                                         actionListener="#{gerenciarCurso.removerCurso}"
+                                         update="cursos, growl"
+                                         process="@this"
+
+                                         onsuccess="dlE.hide()"/>
+                        <p:commandButton value="Não" style="color: red" onclick="dlE.hide();"/>
+                    </h:panelGrid>
+                </p:dialog>
+
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>

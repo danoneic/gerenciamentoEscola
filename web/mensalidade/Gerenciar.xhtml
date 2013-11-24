@@ -1,0 +1,158 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <ui:composition template="/template.xhtml">
+        <ui:define name="panelHeader">Gerenciar Mensalidades</ui:define>
+        <ui:define name="centro">
+            <h:form id ="formulario">
+                <h:panelGrid columns="2">
+                    <h:outputText value="Pesquisar por:" />
+                    <p:selectOneMenu value="#{gerenciarMensalidade.param}">
+                        <f:selectItem itemLabel="Nome" itemValue="nome"/>
+                        <f:selectItem itemLabel="Curso" itemValue="curso"/>
+                        <f:selectItem itemLabel="ID Matrícula" itemValue="matricula"/>
+                        <f:selectItem itemLabel="Turma" itemValue="turma"/>
+                    </p:selectOneMenu>
+                </h:panelGrid>
+
+                <p:inputText style="width:60%" value="#{gerenciarMensalidade.busca}"/>
+                <p:commandButton icon="ui-icon-search" value="Buscar" style="color:blue" actionListener="#{gerenciarMensalidade.consultar}" update="dtMensalidade"/>
+
+                <p:dataTable id="dtMensalidade" var="matricula" value="#{gerenciarMensalidade.gerMat.matriculas}"
+                             emptyMessage="Mensalidade nao encontrada!">>
+                    <f:facet name="header">Resultados da Busca</f:facet>
+
+                    <p:column headerText="ID Matrícula">
+                        <h:outputText value="#{matricula.id}"/> </p:column>
+                    <p:column headerText="Nome">
+                        <h:outputText value="#{matricula.aluno.nome}"/></p:column>
+                    <p:column headerText="Curso">
+                        <h:outputText value="#{matricula.turma.nivel.curso.nome}"/></p:column>
+                    <p:column headerText="Nível">
+                        <h:outputText value="#{matricula.turma.nivel.nome}"/></p:column>
+                    <p:column headerText="Turma" >
+                        <h:outputText value="#{matricula.turma.turma}"/></p:column>
+
+
+                    <p:column headerText="Ações">
+                        <center>
+                            <p:commandButton value="VISUALIZAR" icon="ui-icon-zoomin"
+                                             style="font-size: small; font-weight: bolder" 
+                                             oncomplete="dlgoVisualiza.show();"
+                                             actionListener="#{gerenciarMensalidade.selectMensalidade}"
+                                             update=":formDlgViz:visualiza">
+                                <f:attribute name="matricula" value="#{matricula}"/></p:commandButton>
+
+                            <p:commandButton value="ALTERAR" 
+                                             style="font-size: small; font-weight: bolder" 
+                                             oncomplete="dlgoAltera.show();"
+                                             actionListener="#{gerenciarMensalidade.selectMensalidade}"
+                                             update=":formDlgAlt:alteraDlg">
+                                <f:attribute name="matricula" value="#{matricula}"/></p:commandButton>
+
+                            <p:commandButton value="TURMA INTEIRA" 
+                                             style="font-size: small; font-weight: bolder" 
+                                             oncomplete="dlgoTurma.show();"
+                                             actionListener="#{gerenciarMensalidade.verTurmaInteira}"
+                                             update=":formDlgTurma:turma">
+                                <f:attribute name="matricula" value="#{matricula}"/></p:commandButton>
+
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+
+            <h:form id="formDlgViz">
+                <p:dialog id ="visualiza" header="Visualização" widgetVar="dlgoVisualiza">
+
+                    <h:panelGrid columns="2">
+                        <h:outputText value="ID Matrícula:" />
+                        <p:inputText value="#{gerenciarMensalidade.selecionado.id}" disabled="true"/>
+                        <h:outputText value="Nome:" />
+                        <p:inputText value="#{gerenciarMensalidade.selecionado.aluno.nome}" disabled="true"/>
+                        <h:outputText value="Curso:" />
+                        <p:inputText value="#{gerenciarMensalidade.selecionado.turma.nivel.curso.nome}" disabled="true"/>
+                        <h:outputText value="Nível:" />
+                        <p:inputText value="#{gerenciarMensalidade.selecionado.turma.nivel.nome}" disabled="true"/>
+                    </h:panelGrid>
+
+                    <p:dataTable value="#{gerenciarMensalidade.LMat}" var="mat">
+                        <f:facet name="header"><h:outputText value="MÊS" style="font-weight: bold; color: teal"/></f:facet>
+                        <p:columns value="#{gerenciarMensalidade.dados}" var="mes" headerText="#{mes.mes}">
+                            <p:commandButton  style=" #{gerenciarMensalidade.defineCor(mes)}" disabled="true" value="#{mes.situMensalidade}"/>
+                        </p:columns>
+                    </p:dataTable>
+                </p:dialog> 
+            </h:form>
+
+
+            <h:form id="formDlgAlt">
+                <p:growl id="gMensalidade" showDetail="false" />
+
+                <p:dialog id="alteraDlg" header="Alterar Mensalidade" widgetVar="dlgoAltera">
+                    <h:panelGrid columns="2">
+                        <h:outputText value="ID Matrícula:" />
+                        <p:inputText value="#{gerenciarMensalidade.selecionado.id}" disabled="true"/>
+                        <h:outputText value="Nome:" />
+                        <p:inputText value="#{gerenciarMensalidade.selecionado.aluno.nome}" disabled="true"/>
+                        <h:outputText value="Curso:" />
+                        <p:inputText value="#{gerenciarMensalidade.selecionado.turma.nivel.curso.nome}" disabled="true"/>
+                        <h:outputText value="Nível:" />
+                        <p:inputText value="#{gerenciarMensalidade.selecionado.turma.nivel.nome}" disabled="true"/>
+                    </h:panelGrid>
+
+                    <p:dataTable id="dadosAltera" value="#{gerenciarMensalidade.LMat}" var="mat">
+                        <f:facet name="header"><h:outputText value="MÊS" style="font-weight: bold; color: teal"/></f:facet>
+                        <p:columns id="colunaAtt" value="#{gerenciarMensalidade.dados}" var="mesA" headerText="#{mesA.mes}">
+                            <p:commandButton id="btAtu" disabled="#{gerenciarMensalidade.conferePgto(mesA)}" value="#{mesA.situMensalidade}" 
+                                             style="#{gerenciarMensalidade.defineCor(mesA)}"
+                                             onclick="dlgPg.show();" actionListener="#{gerenciarMensalidade.pagamento}" update=":formDlgAlt:dadosAltera">
+                                <f:attribute  name="mes" value="#{mesA}"/>
+                            </p:commandButton>
+                        </p:columns>
+                    </p:dataTable>
+                    <br/>
+                    <p:separator/>
+                    <br/>
+
+                </p:dialog>
+            </h:form>
+
+
+            <h:form id="formDlgTurma">
+                <p:dialog id="turma" header="Mensalidades da Turma" widgetVar="dlgoTurma">
+                    <h:panelGrid columns="2">
+                        <h:outputText value="Turma" />
+                        <p:inputText value="#{gerenciarMensalidade.selecionado.turma.turma}" disabled="true"/>
+                        <h:outputText value="Professor:" />
+                        <p:inputText value="#{gerenciarMensalidade.selecionado.turma.professor.nome}" disabled="true"/>
+                    </h:panelGrid>
+                      
+                    <p:dataTable id="dtTurma" paginator="true" rows="5" var="matricula" value="#{gerenciarMensalidade.LMat}">
+                        <f:facet name="header"><h:outputText style="font-weight: bold; color: teal" value="Turma"></h:outputText></f:facet>  
+
+                        <p:column><h:outputText value="#{matricula.aluno.nome}"/></p:column>
+                    </p:dataTable>
+                    <br/>
+                </p:dialog>
+            </h:form>
+
+            <h:form id="formDlgPg">
+                <p:dialog header="Efetuar Pagamento" widgetVar="dlgPg">
+                    <p:outputLabel style="font-size: 20px" value="Deseja efetuar o pagamento?"/>
+                    <br/>
+                    <p:separator/>
+                    <br/> 
+
+                    <p:commandButton value="CANCELAR" style="color: red; font-weight: bolder; font-size: small" onclick="dlgPg.hide();"/>
+                    <p:commandButton value="SALVAR" style="color: green; font-weight: bolder; font-size: small; margin-left: 10px" actionListener="#{gerenciarMensalidade.pagamento}" oncomplete="dlgPg.hide()"/>
+                </p:dialog>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>

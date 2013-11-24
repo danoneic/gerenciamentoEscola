@@ -1,0 +1,107 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+    <ui:composition template="/template.xhtml">
+        <ui:define name="panelHeader">Cadastrar Reposição de Aula</ui:define>
+        <ui:define name="help">
+            Como cadastrar!?
+            <br/>
+            1 - Clique na caixa de texto logo à direita do ítem "Data de Reposicao".
+            <br/>
+            2 - Selecione a data de preferência clicando na mesma.
+            <br/>
+            3 - Clique no objeto à direita de onde se lê "Professor"
+            <br/>
+            4 - Selecione o professor responsável para a reposição.
+            <br/>
+            5 - Identifique na tabela abaixo, a matrícula do aluno desejado. <br/>
+            Ela varia conforme o nível que foi escolhido.
+            <br/>
+            6 - Clique então, no botão "adicionar" que está localizado na mesma linha<br/>
+            da matricula do aluno desejado.
+            <br/>
+            ATENÇÃO: TODOS OS CAMPOS COM "*" SÃO OBRIGATÓRIOS!
+        </ui:define>
+        <ui:define name="centro">
+            <h:form id="formBusca" style="font-size: small">
+                <script>
+                    function swNew() {
+                        self.location = "/LangSchool/faces/reposicao/Cadastro.xhtml";
+                    }
+                    function swBack() {
+                        self.location = "/LangSchool/faces/index.xhtml";
+                    }
+                </script>
+                <h:panelGrid id="formDados" cellpadding="5" columns="2">
+                    <p:outputLabel value="Data de Reposicao* :"/>
+                    <p:calendar id="cal" value="#{gerenciarReposicao.reposicao.dataReposicao}"/>
+                    
+                    <p:outputLabel value="Professor* :"/>
+                    <p:selectOneMenu id="somProf" value="#{gerenciarReposicao.reposicao.professor}"
+                                     converter="professor">
+                        <f:selectItem itemValue="" itemLabel="Selecione"/>
+                        <f:selectItems value="#{gerenciarReposicao.professorMan.professores}"
+                                       var="prof" itemLabel="#{prof.nome}" itemValue="#{prof}"/>
+                    </p:selectOneMenu>
+                </h:panelGrid>
+                
+                <br/>
+                <p:separator/>
+                <h:panelGrid id="formPesquisa" cellpadding="5" columns="2">
+                    <p:outputLabel value="Pesquisar por:"/>
+                    <p:selectOneMenu value="#{gerenciarReposicao.matriculaMan.param}">
+                        <f:selectItem itemLabel="Nome" itemValue="nome"/> 
+                        <f:selectItem itemLabel="Turma" itemValue="turma"/> 
+                    </p:selectOneMenu>
+                </h:panelGrid>
+                <p:inputText style="width: 60%" value="#{gerenciarReposicao.matriculaMan.busca}"/>
+                <p:commandButton icon="ui-icon-search" value="Buscar"
+                                 actionListener="#{gerenciarReposicao.matriculaMan.consultarMatricula}"
+                                 update="dtMatriculas" style="font-size: medium;margin-left: 10px; margin-bottom: 20px"/>
+                <br/>    
+                
+                <p:dataTable id="dtMatriculas" value="#{gerenciarReposicao.matriculaMan.matriculas}"
+                             var="mat" emptyMessage="Nenhuma matrícula encontrada" style="font-size: small" paginator="true" rows="5" 
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PageLinks} {LastPageLink}"
+                             paginatorPosition="top">
+                    <f:facet name="header">
+                        Lista de Matrículas
+                    </f:facet>
+                    <p:column headerText="ID">
+                        #{mat.id}
+                    </p:column>
+                    <p:column headerText="Nome">
+                        #{mat.aluno.nome}
+                    </p:column>
+                    <p:column headerText="Curso">
+                        #{mat.turma.nivel.curso.nome}
+                    </p:column>
+                    <p:column headerText="Nivel">
+                        #{mat.turma.nivel.nome}
+                    </p:column>
+                    <p:column headerText="Turma">
+                        #{mat.turma.turma}
+                    </p:column>
+                    <p:column headerText="Acao">
+                        <p:commandButton value="adicionar"
+                                         action="#{gerenciarReposicao.cadastrarReposicaoAulaAction(mat)}" update=":formBusca:addGrowl"/>
+                    </p:column>
+                </p:dataTable>
+                <p:growl id="addGrowl" autoUpdate="true" showDetail="false"/>
+                <p:dialog header="Cadastrado com Sucesso!" widgetVar="confirmation">  
+                    <p:outputLabel value="Deseja cadastrar outra reposicao?" />
+                    <br/>
+                    <br/>
+                    <p:separator/>
+                    <p:commandButton id="confirm" value="Sim" onclick="confirmation.hide();swNew();" type="button"/>  
+                    <p:commandButton id="decline" value="Não" onclick="confirmation.hide();swBack()" type="button"/>   
+
+                </p:dialog>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>

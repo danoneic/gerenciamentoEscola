@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <ui:composition template="/template.xhtml">
+        <ui:define name="panelHeader">Gerenciar Niveis</ui:define>
+        <ui:define name="centro">
+            <h:form id="formGerNivel">
+                <h:outputText value="Pesquisar por:" />
+                <h:panelGrid columns="3" cellpadding="5" id="p1">
+                    <p:selectOneMenu value="#{gerenciarNivel.searchParam}">
+                        <f:selectItem itemLabel="Nome" itemValue="nome"/>
+                        <f:selectItem itemLabel="Descrição" itemValue="descricao"/>
+                        <f:selectItem itemLabel="Curso" itemValue="curso"/>
+                    </p:selectOneMenu>
+
+                    <p:inputText value="#{gerenciarNivel.searchValue}"/>
+                    <p:commandButton update="niveis,p1"
+                                     style="font-size: small;color: blue;font-weight: bold;"
+                                     actionListener="#{gerenciarNivel.consultarNivel}"
+                                     value="BUSCAR"
+                                     icon="ui-icon-search"/>
+                </h:panelGrid>
+
+                <p:dataTable id="niveis" paginator="true" rows="5" paginatorPosition="top"
+                             paginatorAlwaysVisible="true" emptyMessage="Nenhum Resultado Encontrado!"
+                             var="nivel" value="#{gerenciarNivel.niveis}" style="font-size: medium">
+
+                    <p:column headerText="Nome" style="width: 120px">
+                        <h:outputText value="#{nivel.nome}" ></h:outputText>
+                    </p:column>
+                    <p:column headerText="Descrição" style="" >
+                        <h:outputText value="#{nivel.descricao}" style="width: 100%;word-wrap: break-word;" ></h:outputText>
+                    </p:column>
+                    <p:column headerText="C/h" style="width: 40px">
+                        <h:outputText value="#{nivel.cargaHoraria}"></h:outputText>
+                    </p:column>
+                    <p:column headerText="Curso" style="width: 120px">
+                        <h:outputText value="#{nivel.curso.nome}" ></h:outputText>
+                    </p:column>
+                    <p:column>
+                        <p:commandButton value="ALTERAR" style="font-size: small; font-weight: bolder"
+                                         actionListener="#{gerenciarNivel.escolherNivel}"
+                                         process="@this"
+                                         update =":formGerNivel:dlA"
+                                         oncomplete ="dlA.show();">
+                            <f:attribute name="nivel" value="#{nivel}"/>
+                        </p:commandButton>
+                    </p:column>
+                    <p:column>
+                        <p:commandButton value="REMOVER" style="font-size: small; font-weight: bolder"
+                                         actionListener="#{gerenciarNivel.escolherNivel}"
+                                         process="@this"
+                                         update =":formGerNivel:dlE"
+                                         oncomplete ="dlE.show();">
+                                         <f:attribute name="nivel" value="#{nivel}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+
+                <p:growl id="growl"/>
+
+                <p:dialog id="dlA" header="Alterar Nível" widgetVar="dlA" closable="false" >
+
+                    <h:panelGrid columns="2" id="pa">
+                        <h:outputText value="Nome: *" />
+                        <p:inputText value="#{gerenciarNivel.nivelEscolhido.nome}" style="width: 350px "/>
+                        <h:outputText value="Descricao:" />
+                        <p:inputTextarea cols="50" value="#{gerenciarNivel.nivelEscolhido.descricao}"/>
+                        <h:outputLabel value="Carga Horária: "/>
+                        <p:spinner min="0" value="#{gerenciarNivel.nivelEscolhido.cargaHoraria}" />
+                        <h:outputText value="Curso: " />
+                        <p:selectOneMenu value ="#{gerenciarNivel.nivelEscolhido.curso.id}" >
+                            <f:selectItems value="#{gerenciarNivel.cursos}" var="c"
+                                           itemValue="#{c.id}" itemLabel="#{c.nome}" />
+                        </p:selectOneMenu>
+                    </h:panelGrid>
+                    
+                    <h:panelGrid columns="2">
+                        <p:commandButton value="CANCELAR"
+                                         style="color: red; margin-left: 20px;font-size: small;font-weight: bold;"
+                                         onclick="dlA.hide();" process="@this"
+                                         update="dlA,pa,niveis" actionListener="#{gerenciarNivel.consultarNivel}"
+                                         />
+                        
+                        <p:commandButton value="SALVAR"
+                                         style="color: green; margin-left: 20px; font-size: small;font-weight: bold;"
+                                         actionListener="#{gerenciarNivel.atualizarNivel}"
+                                         update="pa, growl,niveis"
+                                         />
+                    </h:panelGrid>
+                    
+                </p:dialog>
+                
+                 <p:dialog id="dlE" header="Excluir Nivel" widgetVar="dlE" closable="false">
+                    <h:outputLabel value="Tem certeza que deseja remover esse nivel?"/>
+                    <p:separator/>
+                    <h:panelGrid columns="2">
+                        <p:commandButton value="Sim" style="color: green"
+                                         actionListener="#{gerenciarNivel.removerNivel}"
+                                         update="niveis,growl" oncomplete="dlE.hide()"
+                                         process="@this"/>
+                        <p:commandButton value="Não" style="color: red" onclick="dlE.hide();"/>
+                    </h:panelGrid>
+                </p:dialog>
+
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>

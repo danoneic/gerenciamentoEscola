@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition template="/template.xhtml">
+        <ui:define name="panelHeader">Cadastrar Fluxo de Caixa</ui:define>
+        <ui:define name="centro">
+            <script>
+                function swNew() {
+                    self.location = "/LangSchool/faces/caixa/Cadastro.xhtml";
+                }
+                function swBack() {
+                    self.location = "/LangSchool/faces/index.xhtml";
+                }
+            </script>
+            <p:dialog header="Cadastrado com Sucesso!" widgetVar="confirmation">  
+                <p:outputLabel value="Deseja cadastrar outro registro?" />
+                <br/>
+                <br/>
+                <p:separator/>
+                <p:commandButton id="confirm" value="Sim" onclick="confirmation.hide();
+                    swNew();" type="button"/>  
+                <p:commandButton id="decline" value="Não" onclick="confirmation.hide();
+                    swBack();" type="button"/>   
+
+            </p:dialog> 
+
+            <h:form>
+                <h:panelGrid columns ="2" cellpadding="4" id="panel">
+                    <h:outputText value="Descrição: *"/>
+                    <p:inputText value="#{gerenciarCaixa.fluxo.descricao}" required="true" label="Descrição"/>
+
+                    <h:outputText value="Valor: *"/>
+                    <p:inputText value="#{gerenciarCaixa.fluxo.valor}" required="true" label="Valor"/> 
+
+                    <h:outputText value="Data: *"/>
+                    <p:calendar navigator="true" showButtonPanel="true" value="#{gerenciarCaixa.fluxo.data}" required="true" label="Data"/>
+
+                </h:panelGrid>
+                <p:growl id="growl" showDetail="true" sticky="true"/>
+
+                <p:selectOneRadio value="#{gerenciarCaixa.fluxo.tipo}" required="true" label="Tipo *">
+                    <f:selectItem itemLabel="Crédito" itemValue="Cred"/>
+                    <f:selectItem itemLabel="Débito" itemValue="Deb"/>
+                </p:selectOneRadio>
+                <br/>
+                <h:panelGrid columns="2" cellpadding="4">
+                    <p:commandButton value="Salvar" style="color: green" update="panel,growl" 
+                                     actionListener="#{gerenciarCaixa.cadastrarFluxo}"/>
+                    <p:commandButton value="Cancelar" style="color: red" onclick="swBack();"/>      
+                </h:panelGrid>
+
+                <br/>
+                <br/>
+                <p:separator/>
+                <h2>Operações Recentes</h2>
+                <br />
+
+                <p:dataTable id="recent" var="fluxoHoje" value="#{gerenciarCaixa.hoje}">
+                    <f:facet name="header" ></f:facet> 
+                    <p:column headerText="Data">
+                        <h:outputText value="#{fluxoHoje.data}"/>
+                    </p:column>
+                    <p:column width="60%" headerText="Descrição">
+                        <h:outputText value="#{fluxoHoje.descricao}"/>
+                    </p:column>
+                    <p:column headerText="Valor ">
+                        <h:outputText value="#{fluxoHoje.valor}"/>
+                    </p:column>
+                    <p:column headerText="Tipo">
+                        <h:outputText value="#{fluxoHoje.tipo}"/>
+                    </p:column>
+                </p:dataTable>
+
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>
